@@ -33,11 +33,7 @@ ESCAPE:
                 JSR     ECHO            ; Output it.
 
 GETLINE:
-                LDA     #$0D            ; Send CR
-                JSR     ECHO
-                LDA     #$0A            ; Send LF
-                JSR     ECHO
-
+                JSR CRLF
                 LDY     #$01            ; Initialize text index.
 BACKSPACE:      DEY                     ; Back up text index.
                 BMI     GETLINE         ; Beyond start of line, reinitialize.
@@ -131,10 +127,7 @@ SETADR:         LDA     L-1,X           ; Copy hex data to
 
 NXTPRNT:
                 BNE     PRDATA          ; NE means no address to print.
-                LDA     #$0D            ; CR.
-                JSR     ECHO            ; Output it.
-                LDA     #$0A            ; LF.
-                JSR     ECHO            ; Output it.
+                JSR     CRLF
                 LDA     XAMH            ; 'Examine index' high-order byte.
                 JSR     PRBYTE          ; Output it in hex format.
                 LDA     XAML            ; Low-order 'examine index' byte.
@@ -180,12 +173,13 @@ PRHEX:
                 ADC     #$06            ; Add offset for letter.
 
 ECHO:
-                STA     ACIA_DATA       ; Output character.
-                PHA                     ; Save A.
-                LDA     #$FF            ; Initialize delay loop.
-TXDELAY:        DEC                     ; Decrement A.
-                BNE     TXDELAY         ; Until A gets to 0.
-                PLA                     ; Restore A.
-                RTS                     ; Return.
+                JSR CHROUT
+                RTS                     ; Return
+CRLF:
+                LDA     #$0D            ; Send CR
+                JSR     ECHO
+                LDA     #$0A            ; Send LF
+                JSR     ECHO
+                RTS
 
 
